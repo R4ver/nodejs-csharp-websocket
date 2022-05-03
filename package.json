@@ -1,0 +1,19 @@
+{
+    "name": "cshark-in-vscode",
+    "version": "1.0.0",
+    "description": "Just a test build project",
+    "main": "none",
+    "author": "R4ver",
+    "license": "MIT",
+    "scripts": {
+        "start": "node -r esm index.js",
+        "build:sharp": "cd modules/thumbparams && dotnet publish -r win-x64 /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true --output \"../release\""
+    },
+    "dependencies": {
+        "eslint": "^8.14.0",
+        "ws": "^8.5.0"
+    },
+    "devDependencies": {
+        "esm": "^3.2.25"
+    }
+}
