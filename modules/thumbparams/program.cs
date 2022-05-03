@@ -6,13 +6,13 @@ namespace ROSC
         public string id = "rosc.module.thumbparameters";
         public int leftThumb {get; set;} = 0;
         public int rightThumb {get; set;} = 0;
-        public Boolean isIndex {get; set;} = false;
-        public Boolean connectedToOVR {get; set;} = false;
+        public bool isIndex {get; set;} = false;
+        public bool connectedToOVR {get; set;} = false;
     }
     class ThumbParamsModule {
         static ThumbParameters thumbParams = new ThumbParameters();
         static WebSocketHelper WS = new WebSocketHelper();
-        public static void Main(String[] args) {
+        public static void Main(string[] args) {
             WS.Init();
 
             WS.Socket.ReconnectionHappened.Subscribe(info =>
