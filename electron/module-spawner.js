@@ -3,15 +3,10 @@ import { spawn } from "child_process";
 
 export default function SpawnModule( module, isExecuteable = false ) {
     let child;
-    const platform = process.platform;
 
     switch ( isExecuteable ) {
     case true:
-        if ( platform === "linux" ) {
-            child = spawn( "msc", `../modules/release/${module}.exe` );
-        } else {
-            child = spawn( resolve( __dirname, `../modules/release/${module}.exe` ) );
-        }
+        child = spawn( resolve( __dirname, `../modules/release/${module}.exe` ) );
         break;
     
     default:
