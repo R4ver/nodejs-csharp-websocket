@@ -7,6 +7,7 @@
     "license": "MIT",
     "scripts": {
         "start": "node -r esm index.js",
+        "mocksocket": "node -r esm testclient.js",
         "build:sharp": "cd modules/thumbparams && dotnet publish -r win-x64 /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true --output \"../release\""
     },
     "dependencies": {

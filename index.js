@@ -1,65 +1,49 @@
 import { WebSocketServer } from "ws";
-import SpawnModule from "./electron/module-spawner";
+import MessageHandler from "./electron/message-handler";
+// import SpawnModule from "./electron/module-spawner";
+import * as moduleConfigs from "./modules/module-info";
 
 const wss = new WebSocketServer( { port: 8080 } );
 
-let connections = {
+let state = {
     frontend: null,
-    modules: []
-}
+    modules: [],
+    isListening: false
+};
 
-console.log("Node Version: ", process.version);
+console.log( "Node Version: ", process.version );
 
 wss.on( "connection", ( ws ) => {
     ws.on( "message", ( data ) => {
-        let message = HandleMessage(data);
-        console.log( "received: %s", message );
-        if ( message && !message.type ) return;
+        let message = FormatMessage( data );
 
-        switch (message.type) {
-            case "identifier":
-                const match = /rosc\.module\.(.+)/g.exec(message.id);
-                if ( match ) {
-                    connections = {
-                        ...connections,
-                        modules: [
-                            ...connections.modules,
-                            {
-                                id: message.id,
-                                socket: ws
-                            }
-                        ]
-                    }
-                    break;
-                }
-                connections = {
-                    ...connections,
-                    frontend: ws
-                }
-                break;
-
-            case "update":
-                connections.frontend.send(SendUpdate(message.payload))
-                break;
+        // console.log( "Message received: ", message );
         
-            default:
-                break;
-        }
+        MessageHandler( state, message, ws, ( newState ) => {
+            state = {
+                ...newState
+            };
+        } );
     } );
 
     ws.send( "connected" );
 } );
 
-wss.on("listening", () => {
-    console.log("Server is listening!");
+wss.on( "listening", () => {
+    console.log( "Server is listening!" );
 
-    const module = SpawnModule("thumbparams", true);
-})
+    state = {
+        ...state,
+        isListening: true
+    };
+} );
 
-const SendUpdate = (payload) => JSON.stringify({
-    type: "update",
-    payload
-});
+// const spawnActiveModules = () => {
+
+//     // SpawnModule( "thumbparams", true );
+// };
+
+
 
 function isJsonString( str ) {
     try {
@@ -70,10 +54,10 @@ function isJsonString( str ) {
     return true;
 }
 
-function HandleMessage(message) {
+function FormatMessage( message ) {
     message = message.toString();
-    if (isJsonString(message)) {
-        return JSON.parse(message);
+    if ( isJsonString( message ) ) {
+        return JSON.parse( message );
     }
 
     return message;
