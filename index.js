@@ -7,7 +7,7 @@ const wss = new WebSocketServer( { port: 8080 } );
 
 let state = {
     frontend: null,
-    modules: [],
+    modules: {},
     isListening: false
 };
 

@@ -5,6 +5,9 @@ const leftThumb = document.getElementById( "leftThumb" );
 const rightThumb = document.getElementById( "rightThumb" );
 const toggle = document.getElementById( "toggle" );
 
+let state = {};
+
+
 toggle.onclick = ( e ) => {
     let value = e.target.checked;
     localStorage.setItem( "module_active", JSON.stringify( {
@@ -26,17 +29,13 @@ socket.addEventListener( "open", function () {
 
 // Listen for messages
 socket.addEventListener( "message", function ( event ) {
-    const data = event.data;
-
-    if ( !isJsonString( data ) ) return;
-    const jsondata = JSON.parse( data );
-    console.log( jsondata );
-    // const { payload } = JSON.parse( data );
-
-    // OVR.innerText = `Connected to OVR: ${payload.connectedToOVR}`;
-    // ctrlType.innerText = `Controller Type: ${payload.isIndex ? "Index Knuckles" : "Quest 2"}`;
-    // leftThumb.innerText = `Left Thumb: ${payload.leftThumb}`;
-    // rightThumb.innerText = `Right Thumb: ${payload.rightThumb}`;
+    const message = FormatMessage( event.data );
+    MessageHandler( state, message, ( newState ) => {
+        state = {
+            ...newState
+        };
+    } );
+    
 } );
 
 function isJsonString( str ) {
@@ -47,3 +46,31 @@ function isJsonString( str ) {
     }
     return true;
 }
+
+function FormatMessage( message ) {
+    message = message.toString();
+    if ( isJsonString( message ) ) {
+        return JSON.parse( message );
+    }
+
+    return message;
+}
+
+function MessageHandler( state, { type, payload }, callback ) {
+    switch ( type ) {
+    case "update":
+        console.log( "Update: ", payload );
+        break;
+
+    default:
+        console.log( "Message not handled by type: ", { state, type, ...payload } );
+        break;
+    }
+
+    callback( state );
+}
+
+const SendUpdate = ( payload ) => JSON.stringify( {
+    type: "update",
+    payload
+} );
