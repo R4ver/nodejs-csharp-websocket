@@ -1,7 +1,7 @@
 import { resolve } from "path";
 import { spawn } from "child_process";
 
-export default function SpawnModule( module, isExecuteable = false ) {
+export default function SpawnModule( module, isExecuteable = false, customPath = null ) {
     let child;
 
     switch ( isExecuteable ) {
@@ -10,7 +10,7 @@ export default function SpawnModule( module, isExecuteable = false ) {
         break;
     
     default:
-        child = spawn( resolve( __dirname, `../modules/release/${module}.js` ) );
+        child = spawn( resolve( __dirname, `${customPath ? customPath : `../modules/release/${module}.js`}` ) );
         break;
     }
 

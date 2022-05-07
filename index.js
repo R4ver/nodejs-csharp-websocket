@@ -1,5 +1,6 @@
 import { WebSocketServer } from "ws";
 import MessageHandler from "./electron/message-handler";
+import SpawnModule from "./electron/module-spawner";
 // import SpawnModule from "./electron/module-spawner";
 import * as moduleConfigs from "./modules/module-info";
 
@@ -25,8 +26,6 @@ wss.on( "connection", ( ws ) => {
             };
         } );
     } );
-
-    ws.send( "connected" );
 } );
 
 wss.on( "listening", () => {
@@ -36,12 +35,15 @@ wss.on( "listening", () => {
         ...state,
         isListening: true
     };
+
+    spawnActiveModules();
 } );
 
-// const spawnActiveModules = () => {
+const spawnActiveModules = () => {
 
-//     // SpawnModule( "thumbparams", true );
-// };
+    // SpawnModule( "thumbparams", true );
+    // SpawnModule( null, false, "../testclient.js" );
+};
 
 
 

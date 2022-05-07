@@ -5,7 +5,11 @@ const leftThumb = document.getElementById( "leftThumb" );
 const rightThumb = document.getElementById( "rightThumb" );
 const toggle = document.getElementById( "toggle" );
 
-let state = {};
+let state = {
+    modules: {
+        
+    }
+};
 
 
 toggle.onclick = ( e ) => {
@@ -30,13 +34,28 @@ socket.addEventListener( "open", function () {
 // Listen for messages
 socket.addEventListener( "message", function ( event ) {
     const message = FormatMessage( event.data );
-    MessageHandler( state, message, ( newState ) => {
+    MessageHandler( state, message, ( newState, updatedID ) => {
         state = {
             ...newState
         };
+
+        UpdateUI( updatedID );
     } );
     
 } );
+
+function UpdateUI( updatedID ) {
+    if ( !updatedID ) return;
+
+    const module = state.modules[updatedID];
+
+    if ( updatedID == "rosc.module.testsocket" ) {
+        OVR.innerText = `Connected to OVR: ${module.connectedOVR}`;
+        ctrlType.innerText = `Controller Type: ${module.isIndex ? "Index Knuckles" : "Quest 2"}`;
+        leftThumb.innerText = `Left Thumb: ${module.leftThumb}`;
+        rightThumb.innerText = `Right Thumb: ${module.rightThumb}`;
+    }    
+}
 
 function isJsonString( str ) {
     try {
@@ -57,9 +76,19 @@ function FormatMessage( message ) {
 }
 
 function MessageHandler( state, { type, payload }, callback ) {
+    var updatedID;
     switch ( type ) {
     case "update":
-        console.log( "Update: ", payload );
+        state = {
+            ...state,
+            modules: {
+                ...state.modules,
+                [payload.id]: {
+                    ...payload
+                }
+            }
+        };
+        updatedID = payload.id;
         break;
 
     default:
@@ -67,7 +96,7 @@ function MessageHandler( state, { type, payload }, callback ) {
         break;
     }
 
-    callback( state );
+    callback( state, updatedID );
 }
 
 const SendUpdate = ( payload ) => JSON.stringify( {
